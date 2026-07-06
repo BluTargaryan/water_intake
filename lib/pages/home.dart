@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:water_intake/data/water_data.dart';
+import 'package:water_intake/models/water_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,26 +16,23 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final amountController = TextEditingController(text: 'hello');
 
-  Future<void> saveWater(String amount) async {
-    final url = Uri.https(
-      "water-intake-54779-default-rtdb.firebaseio.com",
-      "water-intake.json",
+  @override
+  void initState() {
+    Provider.of<WaterData>(context, listen: false).getWaterData();
+    super.initState();
+  }
+
+  void saveWater() async {
+    Provider.of<WaterData>(context, listen: false).addWater(
+      WaterModel(
+        amount: double.parse(amountController.text),
+        datetime: DateTime.now(),
+        unit: 'ml',
+      ),
     );
 
-    var response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: json.encode({
-        "amount": double.parse(amount),
-        'unit': 'ml',
-        'date': DateTime.now().toString(),
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      Navigator.pop(context);
-    } else {
-      throw Exception('Failed to save water');
+    if (!context.mounted) {
+      return;
     }
   }
 
@@ -67,7 +67,8 @@ class _HomePageState extends State<HomePage> {
           ),
           TextButton(
             onPressed: () {
-              saveWater(amountController.text);
+              saveWater();
+              Navigator.pop(context);
             },
             child: Text('Save'),
           ),
@@ -78,18 +79,27 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 4,
-        centerTitle: true,
-        title: Text('Water Intake'),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.map))],
-      ),
+    return Consumer<WaterData>(
+      builder: (context, waterData, child) => Scaffold(
+        appBar: AppBar(
+          elevation: 4,
+          centerTitle: true,
+          title: Text('Water Intake'),
+          actions: [IconButton(onPressed: () {}, icon: Icon(Icons.map))],
+        ),
+        body: ListView.builder(
+          itemCount: waterData.waterDataList.length,
+          itemBuilder: (context, index) {
+            final waterModel = waterData.waterDataList[index];
+            return ListTile(title: Text(waterModel.amount.toString()));
+          },
+        ),
 
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: addWater,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: addWater,
+        ),
       ),
     );
   }
