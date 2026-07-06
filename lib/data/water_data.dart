@@ -22,8 +22,20 @@ class WaterData extends ChangeNotifier {
         'datetime': water.datetime.toString(),
       }),
     );
+    if (response.statusCode == 200) {
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      waterDataList.add(
+        WaterModel(
+          id: extractedData['name'],
+          amount: double.parse(water.amount.toString()),
+          datetime: water.datetime,
+          unit: 'ml',
+        ),
+      );
+    } else {
+      throw Exception('Failed to save water');
+    }
 
-    waterDataList.add(water);
     notifyListeners();
   }
 

@@ -91,7 +91,10 @@ class _HomePageState extends State<HomePage> {
           itemCount: waterData.waterDataList.length,
           itemBuilder: (context, index) {
             final waterModel = waterData.waterDataList[index];
-            return ListTile(title: Text(waterModel.amount.toString()));
+            return ListTile(
+              title: Text(waterModel.amount.toString()),
+              subtitle: Text(waterModel.id!),
+            );
           },
         ),
 
