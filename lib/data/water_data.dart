@@ -54,6 +54,7 @@ class WaterData extends ChangeNotifier {
       for (var element in extractedData.entries) {
         waterDataList.add(
           WaterModel(
+            id: element.key,
             amount: element.value['amount'],
             datetime: DateTime.parse(element.value['datetime']),
             unit: element.value['unit'],
@@ -64,5 +65,49 @@ class WaterData extends ChangeNotifier {
       return waterDataList;
     }
     return [];
+  }
+
+  String getWeekday(DateTime date) {
+    switch (date.weekday) {
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+      case 6:
+        return 'Sat';
+      case 7:
+        return 'Sun';
+      default:
+        return '';
+    }
+  }
+
+  DateTime getStartOfWeek() {
+    DateTime? startOfWeek;
+
+    DateTime now = DateTime.now();
+    for (int i = 0; i < 7; i++) {
+      if (getWeekday(now.subtract(Duration(days: i))) == 'Mon') {
+        startOfWeek = now.subtract(Duration(days: i));
+        break;
+      }
+    }
+    return startOfWeek!;
+  }
+
+  void delete(WaterModel waterModel) async {
+    final url = Uri.https(
+      "water-intake-54779-default-rtdb.firebaseio.com",
+      "water-intake/${waterModel.id}.json",
+    );
+    await http.delete(url);
+    waterDataList.removeWhere((element) => element.id == waterModel.id);
+    notifyListeners();
   }
 }
