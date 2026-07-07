@@ -126,6 +126,26 @@ class _HomePageState extends State<HomePage> {
                   ),
           ],
         ),
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                child: Text(
+                  'Water Intake',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              ListTile(title: Text('Settings'), onTap: () {}),
+              ListTile(title: Text('About'), onTap: () {}),
+            ],
+          ),
+        ),
 
         backgroundColor: Theme.of(context).colorScheme.surface,
         floatingActionButton: FloatingActionButton(
