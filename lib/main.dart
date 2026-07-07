@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => WaterData(),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Water Intake',
         theme: ThemeData(
           // This is the theme of your application.
